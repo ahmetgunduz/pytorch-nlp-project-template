@@ -114,7 +114,7 @@ PyTorch deep learning project made easy.
   ```
 
 ## Usage
-The code in this repo is a Language Modelling example with Rick and Morty Episodes data for NLP project template.
+The code in this repo is a Language Modelling example with Rick and Morty Episodes data for NLP project template inspired from [this medium post](https://medium.com/dsc-manipal/generating-rick-and-morty-episodes-2413b608cd5).
 Try `python train.py -c config.json` to run code.
 
 ### Config file format
