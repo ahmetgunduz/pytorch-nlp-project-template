@@ -1,10 +1,10 @@
 # PyTorch Natural Language Processing Project Template
 This repository is mainly build upon [victoresque](https://github.com/victoresque/pytorch-template)'s
-repository, which is a perfect project for computer vision tasks. However, it was lacking configuration for Natural Language Processing (NLP) tasks, which are obviuosly different from computer vision or time series tasks. Even though there have been many great NLP frameworks published in last years e.g. AllenNLP, fasttext, torchtext, fastai, pytorch-nlp etc., this brought a big complexity and chaos in selection and usage of this frameworks. They all have advantages and disadvantages and one may not easily exploit them togerher easily and has to make a decision. In this project, I aim to provide **a low level api structure** in which any of these frameworks advantage can be exploited easily. For example, in the sample project I used Glove Embeddings by using pytorch-nlp, and what I needed was just to write a simple wrapper class. 
+repository, which is a perfect project for computer vision tasks. However, it was lacking configuration for Natural Language Processing (NLP) tasks, which are obviuosly different from computer vision or time series tasks.
+
+There have been many great NLP frameworks published in last years e.g. AllenNLP, fasttext, torchtext, fastai, pytorch-nlp etc.However, this brought a big complexity and chaos in selection and usage of these frameworks. They all have advantages and disadvantages against each other. One may not easily exploit them together easily and has to make a decision. In this project, I aim to provide **a low level project structure** in which any of these frameworks' advantages can be exploited easily. For example, in the sample project I used Glove Embeddings by using pytorch-nlp, and what I needed was just to write a simple wrapper class. 
 
 Please enjoy and any feedback is welcomed!!! 
-
-PyTorch deep learning project made easy.
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
