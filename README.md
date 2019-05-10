@@ -23,6 +23,7 @@ PyTorch deep learning project made easy.
 		* [Custom CLI options](#custom-cli-options)
 		* [Data Loader](#data-loader)
 		* [Trainer](#trainer)
+		* [Embedding](#embedding)
 		* [Model](#model)
 		* [Loss and metrics](#loss-and-metrics)
 			* [Multiple metrics](#multiple-metrics)
