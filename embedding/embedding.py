@@ -1,12 +1,11 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from base import BaseModel
-from torchnlp.word_to_vector import GloVe, FastText
+from torchnlp.word_to_vector import GloVe
+
+from base import BaseEmbedding
 
 
-class GloveEmbedding(nn.Module):
-
+class GloveEmbedding(BaseEmbedding):
     """ Wrapper class for text generating RNN """
 
     def __init__(self,

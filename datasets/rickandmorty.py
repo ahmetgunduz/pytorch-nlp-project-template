@@ -1,19 +1,20 @@
 import os
-import pdb
-import sys
-import random
+
 import torch
-from torch import utils
 from torch.utils.data import Dataset
+
 from utils.vocab import Vocabulary
 
 
-
 class RickAndMortyDataset(Dataset):
-
     """ Wrapper class to process and produce training samples """
 
-    def __init__(self, data_dir, seq_length, vocab_size=None, vocab=None, training=False):
+    def __init__(self,
+                 data_dir,
+                 seq_length,
+                 vocab_size=None,
+                 vocab=None,
+                 training=False):
         self.data_dir = data_dir
         self.seq_length = seq_length
         self.vocab = Vocabulary()
@@ -32,7 +33,7 @@ class RickAndMortyDataset(Dataset):
             self.vocab.save(os.path.join(data_dir, "vocab.pkl"))
 
         if vocab_size is not None:
-            self.vocab = self.vocab.most_common(vocab_size-2)
+            self.vocab = self.vocab.most_common(vocab_size - 2)
 
         self.text = self.vocab.clean_text(self.text)
         self.tokens = self.vocab.tokenize(self.text)

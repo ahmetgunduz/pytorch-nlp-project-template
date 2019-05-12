@@ -1,9 +1,11 @@
+import time
+
 import numpy as np
 import torch
 from torchvision.utils import make_grid
+
 from base import BaseTrainer
-from utils.util import generate_text, AverageMeter
-import time
+from utils.util import AverageMeter
 
 
 class Trainer(BaseTrainer):
@@ -89,16 +91,16 @@ class Trainer(BaseTrainer):
                                   'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                                   'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
                                   'Loss {loss.val:.4f} ({loss.avg:.4f})'.format(
-                                      epoch,
-                                      batch_idx,
-                                      len(self.data_loader),
-                                      percent=100.0 * batch_idx /
-                                      len(self.data_loader),
-                                      lr=self.optimizer.param_groups[0]['lr'],
-                                      batch_time=batch_time,
-                                      data_time=data_time,
-                                      loss=losses
-                                  ))
+                    epoch,
+                    batch_idx,
+                    len(self.data_loader),
+                    percent=100.0 * batch_idx /
+                            len(self.data_loader),
+                    lr=self.optimizer.param_groups[0]['lr'],
+                    batch_time=batch_time,
+                    data_time=data_time,
+                    loss=losses
+                ))
                 self.writer.add_image(
                     'input', make_grid(
                         data.cpu(), nrow=8, normalize=True))

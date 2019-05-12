@@ -1,9 +1,10 @@
-import os
 import logging
-from pathlib import Path
+import os
+from datetime import datetime
 from functools import reduce
 from operator import getitem
-from datetime import datetime
+from pathlib import Path
+
 from logger import setup_logging
 from utils import read_json, write_json
 
@@ -74,6 +75,7 @@ class ConfigParser:
 
     def __repr__(self):
         return self.config.__repr__()
+
     # setting read-only attributes
 
     @property
@@ -87,6 +89,7 @@ class ConfigParser:
     @property
     def log_dir(self):
         return self.__log_dir
+
 
 # helper functions used to update config dict with custom cli options
 
