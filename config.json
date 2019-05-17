@@ -1,5 +1,5 @@
 {
-  "name": "Rick_And_Morty",
+  "name": "Simpsons",
   "n_gpu": 1,
   "embedding": {
     "type": "GloveEmbedding",
@@ -19,12 +19,12 @@
     }
   },
   "data_loader": {
-    "type": "RickAndMortyDataLoader",
+    "type": "SimpsonsDataLOader",
     "args": {
-      "data_dir": "data/rick_and_morty",
+      "data_dir": "data/simpsons",
       "seq_length": 20,
-      "vocab_size": 1000,
-      "batch_size": 256,
+      "vocab_size": 2000,
+      "batch_size": 2048,
       "shuffle": true,
       "validation_split": 0.2
     }
@@ -32,7 +32,7 @@
   "optimizer": {
     "type": "Adam",
     "args": {
-      "lr": 0.001,
+      "lr": 0.01,
       "weight_decay": 0,
       "amsgrad": true
     }

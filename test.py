@@ -52,14 +52,14 @@ def main(config, resume):
     total_loss = 0.0
     total_metrics = torch.zeros(len(metric_fns))
 
-    for temperature in [0.2, 0.5, 1.0]:
+    for temperature in [0.8, 1.0]:
         print('----- Temperatue: {} -----'.format(temperature))
         print(generate_text(
                 model,
-                start_seq='rick: I hate ',
+                start_seq='I hate',
                 vocab=data_loader.dataset.vocab,
                 temperature=temperature,
-                length=15))
+                length=400))
 
     with torch.no_grad():
         for i, (data, target) in enumerate(tqdm(data_loader)):
