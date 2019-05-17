@@ -2,7 +2,6 @@ import sys
 from pathlib import Path
 from shutil import copytree, ignore_patterns
 
-
 # This script initializes new pytorch nlp project with the template files.
 # Run `python new_project.py ../MyNewProject` then new project named
 # MyNewProject will be made

@@ -32,7 +32,6 @@ class RickAndMortyDataLoader(BaseDataLoader):
             validation_split,
             num_workers)
 
-
 class SimpsonsDataLOader(BaseDataLoader):
     """
     data loading demo using BaseDataLoader
@@ -61,3 +60,4 @@ class SimpsonsDataLOader(BaseDataLoader):
             shuffle,
             validation_split,
             num_workers)
+

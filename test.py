@@ -1,6 +1,8 @@
 import argparse
+
 import torch
 from tqdm import tqdm
+
 import data_loader.data_loaders as module_data
 import embedding.embedding as module_embedding
 import model.loss as module_loss
@@ -8,6 +10,7 @@ import model.metric as module_metric
 import model.model as module_arch
 from parse_config import ConfigParser
 from utils.util import generate_text
+
 
 def main(config, resume):
     logger = config.get_logger('test')
@@ -55,11 +58,11 @@ def main(config, resume):
     for temperature in [0.8, 1.0]:
         print('----- Temperatue: {} -----'.format(temperature))
         print(generate_text(
-                model,
-                start_seq='I hate',
-                vocab=data_loader.dataset.vocab,
-                temperature=temperature,
-                length=400))
+            model,
+            start_seq='rick: I hate ',
+            vocab=data_loader.dataset.vocab,
+            temperature=temperature,
+            length=15))
 
     with torch.no_grad():
         for i, (data, target) in enumerate(tqdm(data_loader)):
@@ -90,13 +93,13 @@ def main(config, resume):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='PyTorch Natural Language Processing Template')
+    parser = argparse.ArgumentParser(
+        description='PyTorch Natural Language Processing Template')
 
     parser.add_argument('-r', '--resume', default=None, type=str,
                         help='path to latest checkpoint (default: None)')
     parser.add_argument('-d', '--device', default=None, type=str,
                         help='indices of GPUs to enable (default: all)')
-
 
     config = ConfigParser(parser)
     args = parser.parse_args()

@@ -1,14 +1,15 @@
 import argparse
 import collections
+
 import torch
+
 import data_loader.data_loaders as module_data
+import embedding.embedding as module_embedding
 import model.loss as module_loss
 import model.metric as module_metric
 import model.model as module_arch
-import embedding.embedding as module_embedding
 from parse_config import ConfigParser
 from trainer import Trainer
-import pdb
 
 
 def main(config):
@@ -18,8 +19,7 @@ def main(config):
     data_loader = config.initialize('data_loader', module_data)
     valid_data_loader = data_loader.split_validation()
 
-
-#     pdb.set_trace()
+    #     pdb.set_trace()
     # build model architecture, then print to console
     config["embedding"]["args"].update({"vocab": data_loader.dataset.vocab})
     embedding = config.initialize('embedding', module_embedding)

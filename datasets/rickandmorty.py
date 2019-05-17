@@ -9,7 +9,12 @@ from utils.vocab import Vocabulary
 class RickAndMortyDataset(Dataset):
     """ Wrapper class to process and produce training samples """
 
-    def __init__(self, data_dir, seq_length, vocab_size=None, vocab=None, training=False):
+    def __init__(self,
+                 data_dir,
+                 seq_length,
+                 vocab_size=None,
+                 vocab=None,
+                 training=False):
         self.data_dir = data_dir
         self.seq_length = seq_length
         self.vocab = Vocabulary()
