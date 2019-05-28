@@ -1,6 +1,8 @@
-import torch
 from abc import abstractmethod
+
+import torch
 from numpy import inf
+
 from logger import WriterTensorboardX
 
 
@@ -91,7 +93,7 @@ class BaseTrainer:
                     # according to specified metric(mnt_metric)
                     improved = (self.mnt_mode == 'min' and log[self.mnt_metric] <= self.mnt_best) or \
                                (self.mnt_mode == 'max' and log[
-                                self.mnt_metric] >= self.mnt_best)
+                                   self.mnt_metric] >= self.mnt_best)
                 except KeyError:
                     self.logger.warning("Warning: Metric '{}' is not found. "
                                         "Model performance monitoring is disabled.".format(self.mnt_metric))
@@ -179,7 +181,7 @@ class BaseTrainer:
         # load optimizer state from checkpoint only when optimizer type is not
         # changed.
         if checkpoint['config']['optimizer'][
-                'type'] != self.config['optimizer']['type']:
+            'type'] != self.config['optimizer']['type']:
             self.logger.warning("Warning: Optimizer type given in config file is different from that of checkpoint. "
                                 "Optimizer parameters not being resumed.")
         else:

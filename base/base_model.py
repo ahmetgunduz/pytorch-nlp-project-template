@@ -1,12 +1,14 @@
-import torch.nn as nn
-import numpy as np
 from abc import abstractmethod
+
+import numpy as np
+import torch.nn as nn
 
 
 class BaseModel(nn.Module):
     """
     Base class for all models
     """
+
     @abstractmethod
     def forward(self, *input):
         """
@@ -23,4 +25,4 @@ class BaseModel(nn.Module):
         model_parameters = filter(lambda p: p.requires_grad, self.parameters())
         params = sum([np.prod(p.size()) for p in model_parameters])
         return super(BaseModel, self).__str__() + \
-            '\nTrainable parameters: {}'.format(params)
+               '\nTrainable parameters: {}'.format(params)

@@ -1,13 +1,9 @@
-import torch
 import torch.nn as nn
-import torch.nn.functional as F
+
 from base import BaseModel
-from embedding.embedding import GloveEmbedding
-import pdb
 
 
 class MortyFire(BaseModel):
-
     """ Wrapper class for text generating RNN """
 
     def __init__(self,
@@ -21,7 +17,7 @@ class MortyFire(BaseModel):
                  embedding=None):
 
         super(MortyFire, self).__init__()
-#         pdb.set_trace()
+        #         pdb.set_trace()
         assert vocab is not None, "Please specify vocab"
         if embedding is None:
             self.embedding = nn.Embedding(self.vocab_size, 200)
@@ -52,10 +48,11 @@ class MortyFire(BaseModel):
 
         self.lstm_dropout = nn.Dropout(lstm_dropout)
         self.classifier = nn.Sequential(
-            nn.Linear(lstm_size * 2, int(self.vocab_size/2)),
+            nn.Linear(lstm_size * 2, int(self.vocab_size / 2)),
             nn.Dropout(fc_dropout),
-            nn.Linear(int(self.vocab_size/2), self.vocab_size)
-            )
+            nn.Linear(int(self.vocab_size / 2), self.vocab_size)
+        )
+
     def forward(self, batch):
         batch_size = batch.size(0)
         embeds = self.embedding(batch)
