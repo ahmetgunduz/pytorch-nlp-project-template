@@ -1,5 +1,5 @@
 {
-  "name": "Simpsons",
+  "name": "Emotion",
   "n_gpu": 1,
   "embedding": {
     "type": "GloveEmbedding",
@@ -9,8 +9,9 @@
     }
   },
   "arch": {
-    "type": "MortyFire",
+    "type": "EmotionFire",
     "args": {
+      "out_dim" : 2,
       "lstm_size": 256,
       "seq_length": 20,
       "num_layers": 2,
@@ -19,9 +20,9 @@
     }
   },
   "data_loader": {
-    "type": "SimpsonsDataLOader",
+    "type": "EmotionDataLoader",
     "args": {
-      "data_dir": "data/simpsons",
+      "data_dir": "data/emotion",
       "seq_length": 20,
       "vocab_size": 2000,
       "batch_size": 2048,
@@ -37,7 +38,7 @@
       "amsgrad": true
     }
   },
-  "loss": "cross_entropy",
+  "loss": "birary_cross_entropy_with_logits",
   "metrics": [
     "accuracy"
   ],

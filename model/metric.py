@@ -12,9 +12,11 @@ def accuracy(outputs, labels):
 
     Returns: (float) accuracy in [0,1]
     """
-
+    # pdb.set_trace()
     _, predicted = torch.max(outputs.data, 1)
+    if len(labels.shape) > 1:
+        _, labels = torch.max(labels.data, 1)
     total = len(labels)
     correct = (predicted == labels).sum()
-    accuracy = correct / total
-    return accuracy.item()
+    accuracy = float(correct) / total
+    return accuracy

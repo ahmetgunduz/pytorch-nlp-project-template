@@ -17,17 +17,16 @@ def ensure_dir(dirname):
 
 
 def read_json(fname):
-    with fname.open('rt') as handle:
+    with fname.open("rt") as handle:
         return json.load(handle, object_hook=OrderedDict)
 
 
 def write_json(content, fname):
-    with fname.open('wt') as handle:
+    with fname.open("wt") as handle:
         json.dump(content, handle, indent=4, sort_keys=False)
 
 
 class Timer:
-
     def __init__(self):
         self.cache = datetime.now()
 
@@ -41,7 +40,7 @@ class Timer:
         self.cache = datetime.now()
 
 
-class Params():
+class Params:
     """Class that loads hyperparameters from a json file.
 
     Example:
@@ -58,7 +57,7 @@ class Params():
             self.__dict__.update(params)
 
     def save(self, json_path):
-        with open(json_path, 'w') as f:
+        with open(json_path, "w") as f:
             json.dump(self.__dict__, f, indent=4)
 
     def update(self, json_path):
@@ -112,13 +111,14 @@ def set_logger(log_path):
     if not logger.handlers:
         # Logging to a file
         file_handler = logging.FileHandler(log_path)
-        file_handler.setFormatter(logging.Formatter(
-            '%(asctime)s:%(levelname)s: %(message)s'))
+        file_handler.setFormatter(
+            logging.Formatter("%(asctime)s:%(levelname)s: %(message)s")
+        )
         logger.addHandler(file_handler)
 
         # Logging to console
         stream_handler = logging.StreamHandler()
-        stream_handler.setFormatter(logging.Formatter('%(message)s'))
+        stream_handler.setFormatter(logging.Formatter("%(message)s"))
         logger.addHandler(stream_handler)
 
 
@@ -129,7 +129,7 @@ def save_dict_to_json(d, json_path):
         d: (dict) of float-castable values (np.float, int, float, etc.)
         json_path: (string) path to json file
     """
-    with open(json_path, 'w') as f:
+    with open(json_path, "w") as f:
         # We need to convert the values to float for json (it doesn't accept
         # np.array, np.float, )
         d = {k: float(v) for k, v in d.items()}
@@ -145,16 +145,19 @@ def save_checkpoint(state, is_best, checkpoint):
         is_best: (bool) True if it is the best model seen till now
         checkpoint: (string) folder where parameters are to be saved
     """
-    filepath = os.path.join(checkpoint, 'last.pth.tar')
+    filepath = os.path.join(checkpoint, "last.pth.tar")
     if not os.path.exists(checkpoint):
         print(
-            "Checkpoint Directory does not exist! Making directory {}".format(checkpoint))
+            "Checkpoint Directory does not exist! Making directory {}".format(
+                checkpoint
+            )
+        )
         os.mkdir(checkpoint)
     else:
         print("Checkpoint Directory exists! ")
     torch.save(state, filepath)
     if is_best:
-        shutil.copyfile(filepath, os.path.join(checkpoint, 'best.pth.tar'))
+        shutil.copyfile(filepath, os.path.join(checkpoint, "best.pth.tar"))
 
 
 def load_checkpoint(checkpoint, model, optimizer=None):
@@ -169,10 +172,10 @@ def load_checkpoint(checkpoint, model, optimizer=None):
     if not os.path.exists(checkpoint):
         raise "File doesn't exist {}"
     checkpoint = torch.load(checkpoint)
-    model.load_state_dict(checkpoint['state_dict'])
+    model.load_state_dict(checkpoint["state_dict"])
 
     if optimizer:
-        optimizer.load_state_dict(checkpoint['optim_dict'])
+        optimizer.load_state_dict(checkpoint["optim_dict"])
 
     return checkpoint
 
@@ -193,13 +196,13 @@ def generate_text(model, start_seq, vocab, length=100, temperature=1.0):
         return pick
 
     model.eval()
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     tokens = vocab.clean_text(start_seq)
     tokens = vocab.tokenize(tokens)
 
     # create a sequence (batch_size=1) with the prime_id
-    current_seq = np.full((1, model.seq_length), vocab['<pad>'])
+    current_seq = np.full((1, model.seq_length), vocab["<pad>"])
     for idx, token in enumerate(tokens):
         current_seq[-1][idx - len(tokens)] = vocab[token]
     predicted = tokens
@@ -224,7 +227,7 @@ def generate_text(model, start_seq, vocab, length=100, temperature=1.0):
         current_seq = np.roll(current_seq, -1, 1)
         current_seq[-1][-1] = word_i
 
-    gen_sentences = ' '.join(predicted)
+    gen_sentences = " ".join(predicted)
 
     gen_sentences = vocab.add_punctuation(gen_sentences)
 

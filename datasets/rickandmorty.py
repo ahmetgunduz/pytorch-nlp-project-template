@@ -9,16 +9,15 @@ from utils.vocab import Vocabulary
 class RickAndMortyDataset(Dataset):
     """ Wrapper class to process and produce training samples """
 
-    def __init__(self,
-                 data_dir,
-                 seq_length,
-                 vocab_size=None,
-                 vocab=None,
-                 training=False):
+    def __init__(
+        self, data_dir, seq_length, vocab_size=None, vocab=None, training=False
+    ):
         self.data_dir = data_dir
         self.seq_length = seq_length
         self.vocab = Vocabulary()
-        with open(os.path.join(data_dir, 'rick_and_morty.txt'), 'r', encoding="utf-8") as f:
+        with open(
+            os.path.join(data_dir, "rick_and_morty.txt"), "r", encoding="utf-8"
+        ) as f:
             self.text = f.read()
 
         if vocab is not None:
@@ -42,8 +41,7 @@ class RickAndMortyDataset(Dataset):
         return len(self.tokens) - self.seq_length
 
     def __getitem__(self, idx):
-        x = [self.vocab[word]
-             for word in self.tokens[idx:idx + self.seq_length]]
+        x = [self.vocab[word] for word in self.tokens[idx : idx + self.seq_length]]
         y = [self.vocab[self.tokens[idx + self.seq_length]]]
         x = torch.LongTensor(x)
         y = torch.LongTensor(y)
