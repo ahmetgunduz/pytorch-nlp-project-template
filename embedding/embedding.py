@@ -1,9 +1,10 @@
+import pdb
+
 import torch
 import torch.nn as nn
 from torchnlp.word_to_vector import GloVe
 
 from base import BaseEmbedding
-import pdb
 
 
 class GloveEmbedding(BaseEmbedding):

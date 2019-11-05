@@ -1,3 +1,4 @@
+import pdb
 import time
 
 import numpy as np
@@ -6,7 +7,6 @@ from torchvision.utils import make_grid
 
 from base import BaseTrainer
 from utils.util import AverageMeter
-import pdb
 
 
 class Trainer(BaseTrainer):
@@ -71,9 +71,9 @@ class Trainer(BaseTrainer):
         for batch_idx, (data, target) in enumerate(self.data_loader):
             data_time.update(time.time() - end_time)
 
-            assert (
-                target.size()[0] == self.valid_data_loader.batch_size
-            ), "Size mismatch"
+            # assert (
+            #     target.size()[0] == self.valid_data_loader.batch_size
+            # ), "Size mismatch"
 
             data, target = data.to(self.device), target.to(self.device)
             output = self.model(data)
@@ -140,9 +140,9 @@ class Trainer(BaseTrainer):
         total_val_metrics = np.zeros(len(self.metrics))
         with torch.no_grad():
             for batch_idx, (data, target) in enumerate(self.valid_data_loader):
-                assert (
-                    target.size()[0] == self.valid_data_loader.batch_size
-                ), "Size mismatch"
+                # assert (
+                #     target.size()[0] == self.valid_data_loader.batch_size
+                # ), "Size mismatch"
                 data, target = data.to(self.device), target.to(self.device)
 
                 output = self.model(data)

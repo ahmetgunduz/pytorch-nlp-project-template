@@ -1,7 +1,7 @@
 from base import BaseDataLoader
+from datasets.emotion_twitter import EmotionDataset
 from datasets.rickandmorty import RickAndMortyDataset
 from datasets.simpsons import SimpsonsDataset
-from datasets.emotion_twitter import EmotionDataset
 
 
 class RickAndMortyDataLoader(BaseDataLoader):
@@ -54,7 +54,7 @@ class EmotionDataLoader(BaseDataLoader):
         )
 
 
-class SimpsonsDataLOader(BaseDataLoader):
+class SimpsonsDataLoader(BaseDataLoader):
     """
     data loading demo using BaseDataLoader
     """
@@ -74,6 +74,6 @@ class SimpsonsDataLOader(BaseDataLoader):
         self.dataset = SimpsonsDataset(
             data_dir=data_dir, seq_length=seq_length, vocab_size=vocab_size, vocab=vocab
         )
-        super(SimpsonsDataLOader, self).__init__(
+        super(SimpsonsDataLoader, self).__init__(
             self.dataset, batch_size, shuffle, validation_split, num_workers
         )

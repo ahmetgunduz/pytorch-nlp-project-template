@@ -232,3 +232,26 @@ def generate_text(model, start_seq, vocab, length=100, temperature=1.0):
     gen_sentences = vocab.add_punctuation(gen_sentences)
 
     return gen_sentences
+
+
+def predict_class(model, input_text, vocab):
+    m = torch.nn.Softmax()
+    model.eval()
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    tokens = vocab.clean_text(input_text)
+    tokens = vocab.tokenize(tokens)
+
+    # create a sequence (batch_size=1) with the prime_id
+    current_seq = np.full((1, model.seq_length), vocab["<pad>"])
+
+    for idx, token in enumerate(tokens):
+        current_seq[-1][idx - len(tokens)] = vocab[token]
+
+    current_seq = torch.LongTensor(current_seq)
+    current_seq = current_seq.to(device)
+
+    output = model(current_seq)
+    _, predicted = torch.max(m(output).data, 1)
+
+    return _, predicted

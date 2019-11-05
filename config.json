@@ -1,5 +1,5 @@
 {
-  "name": "Emotion",
+  "name": "Rick and Morty",
   "n_gpu": 1,
   "embedding": {
     "type": "GloveEmbedding",
@@ -9,9 +9,8 @@
     }
   },
   "arch": {
-    "type": "EmotionFire",
+    "type": "MortyFire",
     "args": {
-      "out_dim" : 2,
       "lstm_size": 256,
       "seq_length": 20,
       "num_layers": 2,
@@ -20,9 +19,9 @@
     }
   },
   "data_loader": {
-    "type": "EmotionDataLoader",
+    "type": "RickAndMortyDataLoader",
     "args": {
-      "data_dir": "data/emotion",
+      "data_dir": "data/rick_and_morty",
       "seq_length": 20,
       "vocab_size": 2000,
       "batch_size": 2048,
@@ -38,7 +37,7 @@
       "amsgrad": true
     }
   },
-  "loss": "birary_cross_entropy_with_logits",
+  "loss": "cross_entropy",
   "metrics": [
     "accuracy"
   ],
