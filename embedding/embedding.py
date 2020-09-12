@@ -1,5 +1,3 @@
-import pdb
-
 import torch
 import torch.nn as nn
 from torchnlp.word_to_vector import GloVe
@@ -21,8 +19,9 @@ class GloveEmbedding(BaseEmbedding):
         # pdb.set_trace()
         vectors = GloVe(name=self.name, dim=self.dim)
         self.weights = torch.zeros(self.vocab_size, vectors.dim)
-        for idx in range(self.vocab_size):
-            self.weights[idx, :] = vectors[self.vocab[idx]]
+
+        for i, idx in enumerate(list(self.vocab.idx2word.keys())):
+            self.weights[i, :] = vectors[self.vocab[idx]]
 
         self.embedding = nn.Embedding(self.vocab_size, self.dim)
         self.embedding.weight.data = torch.Tensor(self.weights)

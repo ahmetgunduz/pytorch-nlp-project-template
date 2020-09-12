@@ -16,15 +16,19 @@ def main(config):
     logger = config.get_logger("train")
 
     # setup data_loader instances
-    data_loader = config.initialize("data_loader", module_data)
-    valid_data_loader = data_loader.split_validation()
+    train_data_loader = config.initialize(
+        "train_data_loader", module_data, **{"training": True}
+    )
+    valid_data_loader = train_data_loader.get_validation()
 
     #     pdb.set_trace()
     # build model architecture, then print to console
-    config["embedding"]["args"].update({"vocab": data_loader.dataset.vocab})
-    embedding = config.initialize("embedding", module_embedding)
-
-    config["arch"]["args"].update({"vocab": data_loader.dataset.vocab})
+    try:
+        config["embedding"]["args"].update({"vocab": train_data_loader.dataset.vocab})
+        embedding = config.initialize("embedding", module_embedding)
+    except:
+        embedding = None
+    config["arch"]["args"].update({"vocab": train_data_loader.dataset.vocab})
     config["arch"]["args"].update({"embedding": embedding})
     model = config.initialize("arch", module_arch)
     logger.info(model)
@@ -48,7 +52,7 @@ def main(config):
         metrics,
         optimizer,
         config=config,
-        data_loader=data_loader,
+        data_loader=train_data_loader,
         valid_data_loader=valid_data_loader,
         lr_scheduler=lr_scheduler,
     )

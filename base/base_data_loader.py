@@ -4,7 +4,7 @@ from torch.utils.data.dataloader import default_collate
 from torch.utils.data.sampler import SubsetRandomSampler
 
 
-class BaseDataLoader(DataLoader):
+class BaseTrainDataLoader(DataLoader):
     """
     Base class for all data loaders
     """
@@ -33,7 +33,9 @@ class BaseDataLoader(DataLoader):
             "collate_fn": collate_fn,
             "num_workers": num_workers,
         }
-        super(BaseDataLoader, self).__init__(sampler=self.sampler, **self.init_kwargs)
+        super(BaseTrainDataLoader, self).__init__(
+            sampler=self.sampler, **self.init_kwargs
+        )
 
     def _split_sampler(self, split):
         if split == 0.0:
@@ -70,3 +72,34 @@ class BaseDataLoader(DataLoader):
             return None
         else:
             return DataLoader(sampler=self.valid_sampler, **self.init_kwargs)
+
+    def get_validation(self):
+        """
+        Get validation loader
+
+        :return: DataLoader
+        """
+        raise NotImplementedError
+
+
+class BaseTestDataLoader(DataLoader):
+    """
+    Base class for all data loaders
+    """
+
+    def __init__(
+        self, dataset, batch_size, shuffle, num_workers, collate_fn=default_collate
+    ):
+        self.shuffle = shuffle
+
+        self.batch_idx = 0
+        self.n_samples = len(dataset)
+
+        self.init_kwargs = {
+            "dataset": dataset,
+            "batch_size": batch_size,
+            "shuffle": self.shuffle,
+            "collate_fn": collate_fn,
+            "num_workers": num_workers,
+        }
+        super(BaseTestDataLoader, self).__init__(**self.init_kwargs)

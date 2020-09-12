@@ -170,7 +170,7 @@ def load_checkpoint(checkpoint, model, optimizer=None):
         optimizer: (torch.optim) optional: resume optimizer from checkpoint
     """
     if not os.path.exists(checkpoint):
-        raise "File doesn't exist {}"
+        raise Exception("File doesn't exist {}")
     checkpoint = torch.load(checkpoint)
     model.load_state_dict(checkpoint["state_dict"])
 
@@ -211,7 +211,7 @@ def generate_text(model, start_seq, vocab, length=100, temperature=1.0):
         current_seq = torch.LongTensor(current_seq)
         current_seq = current_seq.to(device)
 
-        output = model(current_seq)
+        output = model((current_seq, None, None))
         p = torch.nn.functional.softmax(output, dim=1).data
         probabilities = p.cpu().numpy().squeeze()
 
@@ -228,30 +228,54 @@ def generate_text(model, start_seq, vocab, length=100, temperature=1.0):
         current_seq[-1][-1] = word_i
 
     gen_sentences = " ".join(predicted)
-
-    gen_sentences = vocab.add_punctuation(gen_sentences)
-
     return gen_sentences
 
-
-def predict_class(model, input_text, vocab):
-    m = torch.nn.Softmax()
-    model.eval()
+def predict_classes_from_text(model, input_text, dataset):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    tokens = vocab.clean_text(input_text)
-    tokens = vocab.tokenize(tokens)
+    input_ids, attention_mask, segment_ids = dataset.format_in_text(input_text)
+    input_ids = input_ids.to(device).unsqueeze(0)
+    attention_mask = attention_mask.to(device).unsqueeze(0)
+    segment_ids = segment_ids.to(device).unsqueeze(0)
+    batch = (input_ids, attention_mask, segment_ids)
 
-    # create a sequence (batch_size=1) with the prime_id
-    current_seq = np.full((1, model.seq_length), vocab["<pad>"])
+    return predict_classes_from_batch(model, batch)
 
-    for idx, token in enumerate(tokens):
-        current_seq[-1][idx - len(tokens)] = vocab[token]
+def predict_classes_from_batch(model, batch):
+    model.eval()
+    output = model(batch=batch)
+    return output
 
-    current_seq = torch.LongTensor(current_seq)
-    current_seq = current_seq.to(device)
+def predict_class_from_text(model, input_text, dataset):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    output = model(current_seq)
-    _, predicted = torch.max(m(output).data, 1)
+    input_ids, attention_mask, segment_ids = dataset.format_in_text(input_text)
+    input_ids = input_ids.to(device).unsqueeze(0)
+    attention_mask = attention_mask.to(device).unsqueeze(0)
+    segment_ids = segment_ids.to(device).unsqueeze(0)
+    batch = (input_ids, attention_mask, segment_ids)
 
-    return _, predicted
+    return predict_class_from_batch(model, batch)
+
+def predict_class_from_batch(model, batch):
+    m = torch.nn.Softmax(dim=1)
+    model.eval()
+    output = model(batch=batch)
+    output = m(output)
+    return torch.max(output, 1)
+
+
+class SimpleTokenizer(object):
+    def __init__(self):
+        print("Simple tokenizer defined")
+        self.pad_token = "[PAD]"
+        self.unk_token = "[UNK]"
+        self.cls_token = "[CLS]"
+        self.sep_token = "[SEP]"
+        self.pad_token_id = 0
+        self.unk_token_id = 1
+        self.cls_token_id = 2
+        self.sep_token_id = 3
+
+    def tokenize(self, text):
+        return text.split()

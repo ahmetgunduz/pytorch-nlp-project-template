@@ -1,5 +1,6 @@
+import numpy as np
 import torch
-
+from sklearn.metrics import accuracy_score
 
 def accuracy(outputs, labels):
     """
@@ -13,10 +14,32 @@ def accuracy(outputs, labels):
     Returns: (float) accuracy in [0,1]
     """
     # pdb.set_trace()
-    _, predicted = torch.max(outputs.data, 1)
+    _, predicted = torch.max(outputs, 1)
     if len(labels.shape) > 1:
-        _, labels = torch.max(labels.data, 1)
+        _, labels = torch.max(labels, 1)
     total = len(labels)
     correct = (predicted == labels).sum()
     accuracy = float(correct) / total
     return accuracy
+
+def bce_loss(outputs, labels):
+
+    if outputs.is_cuda:
+        outputs = outputs.cpu().detach()
+    if labels.is_cuda:
+        labels = labels.cpu()
+
+    if outputs.shape[0] != 1:
+        predicted = np.argmax(outputs, axis=1)
+    else:
+        predicted = outputs
+    accuracy = accuracy_score(y_true=labels, y_pred=predicted)
+    return accuracy
+
+
+def mse(outputs, labels):
+    return torch.mean((outputs - labels) ** 2)
+
+
+def mae(outputs, labels):
+    return torch.mean(torch.abs(outputs - labels))
