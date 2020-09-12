@@ -1,8 +1,5 @@
-import pdb
-
-import torch
 import torch.nn.functional as F
-from torch.nn import BCELoss, BCEWithLogitsLoss, CrossEntropyLoss
+from torch.nn import BCELoss, BCEWithLogitsLoss, MSELoss
 
 
 def nll_loss(output, target):
@@ -14,4 +11,10 @@ def cross_entropy(output, target):
     return F.cross_entropy(output, target)
 
 
-birary_cross_entropy_with_logits = BCEWithLogitsLoss()
+def none_loss(loss):
+    return loss
+
+
+bce_loss = BCELoss()
+mse_loss = MSELoss()
+binary_cross_entropy_with_logits = BCEWithLogitsLoss()

@@ -1,16 +1,23 @@
 import os
 
 import torch
-from torch.utils.data import Dataset
 
+from base import BaseDataset
 from utils.vocab import Vocabulary
 
-
-class RickAndMortyDataset(Dataset):
+# Depreciated!!!
+class RickAndMortyDataset(BaseDataset):
     """ Wrapper class to process and produce training samples """
 
     def __init__(
-        self, data_dir, seq_length, vocab_size=None, vocab=None, training=False
+        self,
+        data_dir,
+        seq_length,
+        vocab_size=None,
+        vocab=None,
+        training=False,
+        vocab_from_pretrained="bert-base-uncased",
+        do_lower_case=True,
     ):
         self.data_dir = data_dir
         self.seq_length = seq_length
@@ -41,8 +48,16 @@ class RickAndMortyDataset(Dataset):
         return len(self.tokens) - self.seq_length
 
     def __getitem__(self, idx):
-        x = [self.vocab[word] for word in self.tokens[idx : idx + self.seq_length]]
+        input_ids = [
+            self.vocab[word] for word in self.tokens[idx : idx + self.seq_length]
+        ]
         y = [self.vocab[self.tokens[idx + self.seq_length]]]
-        x = torch.LongTensor(x)
+
+        attention_mask = attention_mask = [1] * len(input_ids)
+        segment_ids = attention_mask = [1] * len(input_ids)
+
+        input_ids = torch.LongTensor(input_ids)
+        attention_mask = torch.LongTensor(attention_mask)
+        segment_ids = torch.LongTensor(segment_ids)
         y = torch.LongTensor(y)
-        return x, y
+        return input_ids, attention_mask, segment_ids, y

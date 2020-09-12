@@ -1,38 +1,48 @@
 import pickle
 from collections import Counter
 
+from transformers import BertTokenizer, RobertaTokenizer
+
+from utils import SimpleTokenizer
+
 
 class Vocabulary(object):
     """
     Wrapper class for vocabulary
     """
 
-    def __init__(self):
-        self._word2idx = {}
-        self._idx2word = {}
-        self._counter = Counter()
-        self._size = 0
-        self._punctuation2token = {
-            ";": "<semicolon>",
-            ":": "<colon>",
-            "'": "<inverted_comma>",
-            '"': "<quotation_mark>",
-            ",": "<comma>",
-            "\n": "<new_line>",
-            "!": "<exclamation_mark>",
-            "-": "<hyphen>",
-            "--": "<hyphens>",
-            ".": "<period>",
-            "?": "<question_mark>",
-            "(": "<left_paren>",
-            ")": "<right_paren>",
-            "♪": "<music_note>",
-            "[": "<left_square>",
-            "]": "<right_square>",
-            "’": "<inverted_comma>",
-        }
-        self.add_text("<pad>")
-        self.add_text("<unknown>")
+    def __init__(self, vocab_from_pretrained=None, do_lower_case=True):
+        self.vocab_from_pretrained = vocab_from_pretrained
+        self.do_lower_case = do_lower_case
+        if vocab_from_pretrained:
+            if "bert-" in vocab_from_pretrained:
+                self.tokenizer = BertTokenizer.from_pretrained(
+                    vocab_from_pretrained, do_lower_case=do_lower_case
+                )
+                self.word2idx = dict(self.tokenizer.vocab)
+            elif "roberta-" in vocab_from_pretrained:
+                self.tokenizer = RobertaTokenizer.from_pretrained(
+                    vocab_from_pretrained, do_lower_case=do_lower_case
+                )
+                self.word2idx = {}
+                self.idx2word = {}
+                self._counter = Counter()
+                self._size = 0
+
+            self.idx2word = {v: k for k, v in self.word2idx.items()}
+            self._counter = Counter()
+            self._size = len(self.word2idx)
+        else:
+            self.tokenizer = SimpleTokenizer()
+            self.word2idx = {}
+            self.idx2word = {}
+            self._counter = Counter()
+            self._size = 0
+        # Order is too important!!! Please, look at SimpleTokenizer if you want to change!
+        self.add_word(self.tokenizer.pad_token)
+        self.add_word(self.tokenizer.unk_token)
+        self.add_word(self.tokenizer.cls_token)
+        self.add_word(self.tokenizer.sep_token)
 
     def add_word(self, word):
         """
@@ -40,10 +50,14 @@ class Vocabulary(object):
         :param word: (str) word to add to vocabulary
         :return: None
         """
-        word = word.lower()
-        if word not in self._word2idx:
-            self._idx2word[self._size] = word
-            self._word2idx[word] = self._size
+        if word not in self.word2idx:
+            if self.vocab_from_pretrained:
+                if "roberta-" in self.vocab_from_pretrained:
+                    self.idx2word[self.tokenizer.convert_tokens_to_ids(word)] = word
+                    self.word2idx[word] = self.tokenizer.convert_tokens_to_ids(word)
+            else:
+                self.idx2word[self._size] = word
+                self.word2idx[word] = self._size
             self._size += 1
         self._counter[word] += 1
 
@@ -64,12 +78,6 @@ class Vocabulary(object):
         :param text: (str) text to be cleaned
         :return: (str) cleaned text
         """
-        text = text.lower().strip()
-        for key, token in self._punctuation2token.items():
-            text = text.replace(key, " {} ".format(token))
-        text = text.strip()
-        while "  " in text:
-            text = text.replace("  ", " ")
         return text
 
     def tokenize(self, text):
@@ -78,17 +86,7 @@ class Vocabulary(object):
         :param text: (str) text to be tokenized
         :return: (list) list of tokens in text
         """
-        return text.split(" ")
-
-    def set_vocab(self, vocab):
-        self._word2idx = {}
-        self._idx2word = {}
-        self._counter = Counter()
-        self._size = 0
-        self.add_text("<pad>")
-        self.add_text("<unknown>")
-        for word in vocab:
-            self.add_word(word)
+        return self.tokenizer.tokenize(text)
 
     def most_common(self, n):
         """
@@ -97,6 +95,7 @@ class Vocabulary(object):
         :return: (Vocabulary) vocabulary containing n most frequent tokens
         """
         tmp = Vocabulary()
+
         for w in self._counter.most_common(n):
             tmp.add_word(w[0])
             tmp._counter[w[0]] = w[1]
@@ -123,28 +122,6 @@ class Vocabulary(object):
             pickle.dump(self.__dict__, f)
         print("\nVocabulary successfully stored as [{}]\n".format(path))
 
-    def add_punctuation(self, text):
-        """
-        Replces punctuation tokens with corresponding characters
-        :param text: (str) text to process
-        :return: text with punctuation tokens replaced with characters
-        """
-        for key, token in self._punctuation2token.items():
-            text = text.replace(token, " {} ".format(key))
-        text = text.strip()
-        while "  " in text:
-            text = text.replace("  ", " ")
-        text = text.replace(" :", ":")
-        text = text.replace(" ' ", "'")
-        text = text.replace("[ ", "[")
-        text = text.replace(" ]", "]")
-        text = text.replace(" .", ".")
-        text = text.replace(" ,", ",")
-        text = text.replace(" !", "!")
-        text = text.replace(" ?", "?")
-        text = text.replace(" ’ ", "’")
-        return text
-
     def __len__(self):
         """
         Number of unique words in vocabulary
@@ -163,10 +140,10 @@ class Vocabulary(object):
         Return <unknown> if id/word is not present in the vocabulary
         """
         if isinstance(item, int):
-            return self._idx2word[item]
+            return self.idx2word[item]
         elif isinstance(item, str):
-            if item in self._word2idx:
-                return self._word2idx[item]
+            if item in self.word2idx:
+                return self.word2idx[item]
             else:
-                return self._word2idx["<unknown>"]
+                return self.word2idx[self.tokenizer.unk_token]
         return None

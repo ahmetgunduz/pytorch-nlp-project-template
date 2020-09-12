@@ -1,6 +1,92 @@
+import torch
 import torch.nn as nn
+import torch.nn.functional as F
+from transformers import BertForSequenceClassification
+from transformers import BertModel
 
 from base import BaseModel
+
+
+class BertClassifier(BaseModel):
+    def __init__(
+        self,
+        seq_length,
+        name="bert-base-uncased",
+        out_dim=2,
+        vocab=None,
+        embedding=None,
+    ):
+
+        super(BertClassifier, self).__init__()
+        
+        assert vocab is not None, "Please specify vocab"
+        self.vocab = vocab
+        self.vocab_size = len(self.vocab)
+        self.name = name
+        assert embedding is None, "Embedding should be None"
+        self.out_dim = out_dim
+        self.model = BertForSequenceClassification.from_pretrained(
+            self.name, num_labels=self.out_dim
+        )
+
+        for param in self.model.parameters():
+            param.requires_grad = True
+        for param in self.model.classifier.parameters():
+            param.requires_grad = True
+
+        self.softmax = torch.nn.Softmax(dim=1)
+
+    def forward(self, batch):
+        input_ids, attention_mask, segment_ids = batch
+        batch_size = input_ids.size(0)
+        outputs = self.model(input_ids, segment_ids, attention_mask, labels=None)
+        logits = outputs[0]
+        logits = logits.view(batch_size, -1, self.out_dim)
+        out = logits[:, -1]
+        out = self.softmax(out)
+        return out
+
+    def get_bert_features(self, batch):
+        input_ids, attention_mask, segment_ids = batch
+        
+        features = self.model.bert(input_ids, segment_ids, attention_mask)
+
+        return features
+
+
+class BertRegressor(BaseModel):
+    def __init__(
+        self,
+        seq_length,
+        name="bert-base-uncased",
+        out_dim=2,
+        vocab=None,
+        embedding=None,
+    ):
+        super(BertRegressor, self).__init__()
+
+        assert vocab is not None, "Please specify vocab"
+        self.vocab = vocab
+        self.vocab_size = len(self.vocab)
+        self.name = name
+        assert embedding is None, "Embedding should be None"
+        self.out_dim = out_dim
+        self.model = BertForSequenceClassification.from_pretrained(
+            self.name, num_labels=self.out_dim
+        )
+        for param in self.model.parameters():
+            param.requires_grad = False
+        for param in self.model.classifier.parameters():
+            param.requires_grad = True
+
+    def forward(self, batch):
+        input_ids, attention_mask, segment_ids = batch
+        batch_size = input_ids.size(0)
+        outputs = self.model(input_ids, segment_ids, attention_mask, labels=None)
+        logits = outputs[0]
+        logits = logits.view(batch_size, -1, self.out_dim)
+        out = logits[:, -1]
+        return out
 
 
 class MortyFire(BaseModel):
@@ -58,8 +144,10 @@ class MortyFire(BaseModel):
         )
 
     def forward(self, batch):
-        batch_size = batch.size(0)
-        embeds = self.embedding(batch)
+
+        input_ids, attention_mask, segment_ids = batch
+        batch_size = input_ids.size(0)
+        embeds = self.embedding(input_ids)
         lstm_out, hidden = self.lstm(embeds)
         lstm_out = lstm_out.contiguous().view(-1, self.lstm_size * 2)
         drop = self.lstm_dropout(lstm_out)
@@ -69,7 +157,7 @@ class MortyFire(BaseModel):
         return out
 
 
-class EmotionFire(BaseModel):
+class MyClassifier(BaseModel):
     """ Wrapper class for text generating RNN """
 
     def __init__(
@@ -85,7 +173,7 @@ class EmotionFire(BaseModel):
         embedding=None,
     ):
 
-        super(EmotionFire, self).__init__()
+        super(MyClassifier, self).__init__()
         #         pdb.set_trace()
         assert vocab is not None, "Please specify vocab"
         if embedding is None:
@@ -126,8 +214,9 @@ class EmotionFire(BaseModel):
         )
 
     def forward(self, batch):
-        batch_size = batch.size(0)
-        embeds = self.embedding(batch)
+        input_ids, attention_mask, segment_ids = batch
+        batch_size = input_ids.size(0)
+        embeds = self.embedding(input_ids)
         lstm_out, hidden = self.lstm(embeds)
         lstm_out = lstm_out.contiguous().view(-1, self.lstm_size * 2)
         drop = self.lstm_dropout(lstm_out)

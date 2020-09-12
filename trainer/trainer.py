@@ -1,4 +1,3 @@
-import pdb
 import time
 
 import numpy as np
@@ -68,15 +67,16 @@ class Trainer(BaseTrainer):
         total_loss = 0
         total_metrics = np.zeros(len(self.metrics))
         end_time = time.time()
-        for batch_idx, (data, target) in enumerate(self.data_loader):
+        for batch_idx, (input_ids, attention_mask, segment_ids, target) in enumerate(
+            self.data_loader
+        ):
             data_time.update(time.time() - end_time)
 
-            # assert (
-            #     target.size()[0] == self.valid_data_loader.batch_size
-            # ), "Size mismatch"
-
-            data, target = data.to(self.device), target.to(self.device)
-            output = self.model(data)
+            target = target.to(self.device)
+            input_ids = input_ids.to(self.device)
+            attention_mask = attention_mask.to(self.device)
+            segment_ids = segment_ids.to(self.device)
+            output = self.model(batch=(input_ids, attention_mask, segment_ids))
             loss = self.loss(output, target)
 
             self.optimizer.zero_grad()
@@ -89,7 +89,7 @@ class Trainer(BaseTrainer):
             total_loss += loss.item()
             total_metrics += self._eval_metrics(output, target)
 
-            losses.update(loss.item(), data.size(0))
+            losses.update(loss.item(), target.size(0))
             batch_time.update(time.time() - end_time)
             end_time = time.time()
             if batch_idx % self.log_step == 0:
@@ -107,9 +107,6 @@ class Trainer(BaseTrainer):
                         data_time=data_time,
                         loss=losses,
                     )
-                )
-                self.writer.add_image(
-                    "input", make_grid(data.cpu(), nrow=8, normalize=True)
                 )
 
         log = {
@@ -139,13 +136,16 @@ class Trainer(BaseTrainer):
         total_val_loss = 0
         total_val_metrics = np.zeros(len(self.metrics))
         with torch.no_grad():
-            for batch_idx, (data, target) in enumerate(self.valid_data_loader):
-                # assert (
-                #     target.size()[0] == self.valid_data_loader.batch_size
-                # ), "Size mismatch"
-                data, target = data.to(self.device), target.to(self.device)
+            for (
+                batch_idx,
+                (input_ids, attention_mask, segment_ids, target),
+            ) in enumerate(self.valid_data_loader):
+                target = target.to(self.device)
+                input_ids = input_ids.to(self.device)
+                attention_mask = attention_mask.to(self.device)
+                segment_ids = segment_ids.to(self.device)
 
-                output = self.model(data)
+                output = self.model(batch=(input_ids, attention_mask, segment_ids))
                 loss = self.loss(output, target)
 
                 self.writer.set_step(
@@ -154,10 +154,7 @@ class Trainer(BaseTrainer):
                 self.writer.add_scalar("loss", loss.item())
                 total_val_loss += loss.item()
                 total_val_metrics += self._eval_metrics(output, target)
-                self.writer.add_image(
-                    "input", make_grid(data.cpu(), nrow=8, normalize=True)
-                )
-
+                
         # add histogram of model parameters to the tensorboard
         for name, p in self.model.named_parameters():
             self.writer.add_histogram(name, p, bins="auto")
